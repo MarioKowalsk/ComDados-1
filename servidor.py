@@ -1,12 +1,16 @@
 import socket
-import threading
 import matplotlib.pyplot as plt
 import numpy as np
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
 
-HOST = "192.168.18.23"
+#localhost
+#HOST = "127.0.0.1"
+#Endereço IP a ser alocado
+HOST = "192.168.0.152"
+#Porta a ser alocada
 PORT = 65432
+#Tamanho da chave assimetrica
 KEY_SIZE = '1024'
 SIGNAL = 2
 
@@ -17,7 +21,7 @@ def criptografar(msg):
     #cria uma cifra baseada na chave
     cipher = PKCS1_OAEP.new(key)
     #criptografa o texto que foi tranformado em bytes usando a ISO-8859-1
-    ciphertext = cipher.encrypt(msg.encode('latin-1'))
+    ciphertext = cipher.encrypt(msg.encode('utf-8'))
     return ciphertext
 
 #Função para aplicar o AMI à mensagem criptografada
@@ -38,12 +42,20 @@ def AMI(msg):
         else:
             pos.append(0)
     #Mostra os graficos do sinal pre e pós AMI
+    #Mostra somente os primeiros 24 sinais para evitar aglomeramento
     figure, axis = plt.subplots(2)
     axis[0].step(np.arange(0, 24), pre[0:24], where='post')
     axis[1].step(np.arange(0, 24), pos[0:24], where='post')
+    #Versão para todos os pontos
+    #axis[0].step(np.arange(0, len(pre)), pre, where='post')
+    #axis[1].step(np.arange(0, len(pos)), pos, where='post')
     axis[0].set_ylim([1.5, -0.5])
     axis[0].set_title("Pre-AMI")
     axis[1].set_title("Pós-AMI")
+    axis[0].set_yticks([0, 1], minor=False)
+    axis[1].set_yticks([SIGNAL, 0, -SIGNAL], minor=False)
+    axis[0].grid(True, which="major")
+    axis[1].grid(True, which="major")
     plt.show()  
     return pos
         
