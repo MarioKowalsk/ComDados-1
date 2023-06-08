@@ -9,7 +9,7 @@ from Crypto.PublicKey import RSA
 #Endereço IP do servidor
 HOST = "192.168.0.152"
 #Porta do servidor
-PORT = 65432
+PORT = 24756
 #Tamanho da chave assimetrica
 KEY_SIZE = '1024'
 SIGNAL = 2
@@ -24,14 +24,15 @@ def decodificar(msg):
     return cipher.decrypt(msg)
 
 def decodeAMI(msg):
-    pre = list(msg)
+    
+    pre = []
+    for i in range(1, len(msg) + 1):
+        pre.append(int.from_bytes(msg[i - 1:i], byteorder='big', signed=True))
     pos = []
     for i in range(len(pre)):
         #Se for algo diferente de zero, significa que foi alterado pelo AMI e que é preciso voltar o bit para 1
         if pre[i] != 0:
             pos.append(1)
-            if pre[i] == 254:
-                pre[i] = -SIGNAL
         #Se for 0, então se mantem em 0 uma vez que o AMI não muda os zeros
         else:
             pos.append(0) 
@@ -44,8 +45,8 @@ def decodeAMI(msg):
     #axis[0].step(np.arange(0, len(pre)), pre, where='post')
     #axis[1].step(np.arange(0, len(pos)), pos, where='post')
     axis[0].set_ylim([2.5, -2.5])
-    axis[0].set_title("Pós-AMI")
-    axis[1].set_title("Pre-AMI")
+    axis[1].set_title("Pós-AMI Inverso")
+    axis[0].set_title("Pre-AMI Inverso")
     axis[0].set_yticks([SIGNAL, 0, -SIGNAL], minor=False)
     axis[1].set_yticks([0, 1], minor=False)
     axis[0].grid(True, which="major")
@@ -61,7 +62,7 @@ def bitstring_to_bytes(s):
     while v:
         b.append(v & 0xff)
         v >>= 8
-    return bytes(b[::-1])            
+    return bytes(b[::-1])
 
 def main():
     #Cria um socket com o endereço IP e porta configuradas
@@ -72,6 +73,7 @@ def main():
     print("Mensagem recebida: " + str(msg) + '\n' + "--------------------------------------------------------------------------------------------------", end='\n\n')
     msg = decodeAMI(msg)
     arr = ''.join(str(x) for x in msg)
+    arr = '0b' + arr
     print("Mensagem pós-AMI: " + str(arr) + '\n' + "--------------------------------------------------------------------------------------------------", end='\n\n')
     msg = bitstring_to_bytes(arr)
     print("Mensagem em bytes: " + str(msg) + '\n' + "--------------------------------------------------------------------------------------------------", end='\n\n')

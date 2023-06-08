@@ -1,4 +1,4 @@
-import socket
+from socket import socket, gethostbyname, AF_INET, SOCK_STREAM
 import matplotlib.pyplot as plt
 import numpy as np
 from Crypto.Cipher import PKCS1_OAEP
@@ -9,7 +9,7 @@ from Crypto.PublicKey import RSA
 #Endereço IP a ser alocado
 HOST = "192.168.0.152"
 #Porta a ser alocada
-PORT = 65432
+PORT = 24756
 #Tamanho da chave assimetrica
 KEY_SIZE = '1024'
 SIGNAL = 2
@@ -78,9 +78,13 @@ def handle(conn, addr):
 
 def main():
     #Cria um socket
-    s =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s =  socket(AF_INET, SOCK_STREAM)
     #Atriubuí a ele o IP e a Porta determinados
+    
     s.bind((HOST, PORT))
+    #s.bind((hostName, PORT))
+    
+    print("Listening on " + str(HOST) + " " + str(PORT))
     #Deixa ele esperando para conexões
     s.listen()
     
