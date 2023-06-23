@@ -39,15 +39,18 @@ def decodeAMI(msg):
     #Mostra os graficos do sinal pre e pós AMI inverso
     #Mostra somente os primeiros 24 sinais para evitar aglomeramento
     figure, axis = plt.subplots(2)
-    axis[0].step(np.arange(0, 24), pre[0:24], where='post')
-    axis[1].step(np.arange(0, 24), pos[0:24], where='post')
+    axis[0].step(np.arange(0, min(len(pre), 24)), pre[0:min(len(pre), 24)], where='post')
+    axis[1].step(np.arange(0, min(len(pos), 24)), pos[0:min(len(pos), 24)], where='post')
     #Versão para todos os pontos
     #axis[0].step(np.arange(0, len(pre)), pre, where='post')
     #axis[1].step(np.arange(0, len(pos)), pos, where='post')
-    axis[0].set_ylim([2.5, -2.5])
-    axis[1].set_title("Pós-AMI Inverso")
+    axis[0].set_ylim([-SIGNAL - 1, SIGNAL + 1])
+    axis[1].set_ylim([2, -1])
     axis[0].set_title("Pre-AMI Inverso")
-    axis[0].set_yticks([SIGNAL, 0, -SIGNAL], minor=False)
+    axis[1].set_title("Pós-AMI Inverso")
+    axis[0].set_yticks([-SIGNAL, 0, SIGNAL], minor=False)
+    if(pos[0] == 1):
+        axis[1].invert_yaxis()
     axis[1].set_yticks([0, 1], minor=False)
     axis[0].grid(True, which="major")
     axis[1].grid(True, which="major")
@@ -57,12 +60,9 @@ def decodeAMI(msg):
 # Função para converter uma string de bits para bytes
 # Retirada de https://stackoverflow.com/a/32676625
 def bitstring_to_bytes(s):
-    v = int(s, 2)
-    b = bytearray()
-    while v:
-        b.append(v & 0xff)
-        v >>= 8
-    return bytes(b[::-1])
+    #Converte o arrays de bits para int usando base 2, depois converte esse int para bytes.
+    #O tamanho da mensagem e bytes é o número de bit dividido por 8, já que tem 8 bits por byte
+    return int(s, 2).to_bytes(len(s) // 8, byteorder='big')
 
 def main():
     #Cria um socket com o endereço IP e porta configuradas

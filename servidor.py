@@ -35,7 +35,7 @@ def AMI(msg):
     for i in range(2, len(msg)):
         pre.append(msg[i])
         #Se for um bit ligado, fica alternado entre um sinal positivo e negativo
-        if (msg[i]) == '1':
+        if int(msg[i]) == 1:
             pos.append(sig)
             sig = -sig
         #Para bits desligados, nada é feito
@@ -44,16 +44,19 @@ def AMI(msg):
     #Mostra os graficos do sinal pre e pós AMI
     #Mostra somente os primeiros 24 sinais para evitar aglomeramento
     figure, axis = plt.subplots(2)
-    axis[0].step(np.arange(0, 24), pre[0:24], where='post')
-    axis[1].step(np.arange(0, 24), pos[0:24], where='post')
+    axis[0].step(np.arange(0, min(len(pre), 24)), pre[0:min(len(pre), 24)], where='pre')
+    axis[1].step(np.arange(0, min(len(pos), 24)), pos[0:min(len(pos), 24)], where='pre')
     #Versão para todos os pontos
     #axis[0].step(np.arange(0, len(pre)), pre, where='post')
     #axis[1].step(np.arange(0, len(pos)), pos, where='post')
-    axis[0].set_ylim([1.5, -0.5])
+    axis[0].set_ylim([2, -1])
+    axis[1].set_ylim([-SIGNAL - 1, SIGNAL + 1])
     axis[0].set_title("Pre-AMI")
     axis[1].set_title("Pós-AMI")
     axis[0].set_yticks([0, 1], minor=False)
-    axis[1].set_yticks([SIGNAL, 0, -SIGNAL], minor=False)
+    if(pre[0] == 1):
+        axis[0].invert_yaxis()
+    axis[1].set_yticks([-SIGNAL, 0, SIGNAL], minor=False)
     axis[0].grid(True, which="major")
     axis[1].grid(True, which="major")
     plt.show()  
