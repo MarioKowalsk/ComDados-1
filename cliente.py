@@ -7,7 +7,7 @@ from Crypto.PublicKey import RSA
 #localhost
 #HOST = "127.0.0.1"
 #Endereço IP do servidor
-HOST = "192.168.0.152"
+HOST = "172.20.10.2"
 #Porta do servidor
 PORT = 24756
 #Tamanho da chave assimetrica
@@ -24,7 +24,6 @@ def decodificar(msg):
     return cipher.decrypt(msg)
 
 def decodeAMI(msg):
-    
     pre = []
     for i in range(1, len(msg) + 1):
         pre.append(int.from_bytes(msg[i - 1:i], byteorder='big', signed=True))
@@ -62,7 +61,12 @@ def decodeAMI(msg):
 def bitstring_to_bytes(s):
     #Converte o arrays de bits para int usando base 2, depois converte esse int para bytes.
     #O tamanho da mensagem e bytes é o número de bit dividido por 8, já que tem 8 bits por byte
-    return int(s, 2).to_bytes(len(s) // 8, byteorder='big')
+    v = int(s, 2)
+    b = bytearray()
+    while v:
+        b.append(v & 0xff)
+        v >>= 8
+    return bytes(b[::-1])            
 
 def main():
     #Cria um socket com o endereço IP e porta configuradas

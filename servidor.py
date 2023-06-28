@@ -7,7 +7,7 @@ from Crypto.PublicKey import RSA
 #localhost
 #HOST = "127.0.0.1"
 #Endereço IP a ser alocado
-HOST = "192.168.0.152"
+HOST = "172.20.10.2"
 #Porta a ser alocada
 PORT = 24756
 #Tamanho da chave assimetrica
